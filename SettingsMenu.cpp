@@ -27,7 +27,6 @@ int main(){
     cbreak();
     noecho();
 
-start:
     // STDSCR variables
     short int main_h = 14;
     short int main_w = 54;
@@ -224,7 +223,6 @@ start:
         {
            a = tempX;
            b = tempY;
-           goto start;
         }
     }
     endwin();
