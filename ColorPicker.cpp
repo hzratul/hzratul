@@ -2,13 +2,9 @@
 // 227 - resultant cokor
 // 1 - 216 - (pair no) 216 color cube boxes
 // 217 - (pair no) color picker tag
-// 218 - (pair no) red slider
-// 219 - (pair no) red slider
+// 218 - (pair no) red slider                                                    // 219 - (pair no) red slider
 // 220 - (pair no) red slider
-// 221 - (pair no) for winFill
-
-
-#include <ncurses.h>
+// 221 - (pair no) for winFill                                                                                                                                                                                                                     #include <ncurses.h>
 #include <cstdint>
 #include <cmath>
 
@@ -19,20 +15,8 @@ void dim_slider_window(WINDOW * win);
 void highlight_slider_window(WINDOW * win);
 void fill8_vl(WINDOW * win, int8_t height);
 void modify_slider(WINDOW * win, short int* baseColorValue, short int upperLimit, short int pairNumber);
-void fill_window(WINDOW * win,short int r,short int g,short int b, int8_t winFillH);
-
-
-int main()
-{
-    initscr();
-    noecho();
-    cbreak();
-    curs_set(0);
-    start_color();
-    keypad(stdscr, TRUE);
-
-    // Variable for Windows Height & Width
-    int8_t winMainH = 19;
+void fill_window(WINDOW * win, int8_t winFillH);
+void change_resultantWin_color(WINDOW * win,short int r,short int g,short int b, int8_t winFillH);                                                                                                                                                                                                                                  int main()                                                                       {                                                                                    initscr();                                                                       noecho();                                                                        cbreak();                                                                        curs_set(0);                                                                     start_color();                                                                   keypad(stdscr, TRUE);                                                                                                                                             // Variable for Windows Height & Width                                           int8_t winMainH = 19;
     int8_t winMainW = 50;
     int8_t gap = 2;
     int8_t winColorCubesH = 8;
@@ -102,10 +86,9 @@ int main()
     init_pair(220, 6, COLOR_BLACK); // blue on black
 //**********************************************//
     // ***Main ENGINE***
-    int colorLoop {1073741824};
+    int ch;
     int8_t baseColor {1};
     short int pairNumber {218};
-    int8_t a = colorLoop % 3;
     bool rgbValueRegular = true;
 
     short int upperLimit {255};
@@ -113,20 +96,76 @@ int main()
     short int gValue {upperLimit};
     short int bValue {upperLimit};
 
-    short int * baseColorValue = &rValue;
+    short int * baseColorValue = &gValue;
 
-    int ch;
+    // this use of modify function is for initializing sliders
+    modify_slider(winSliderG, baseColorValue, upperLimit, 219); // G
+    baseColorValue = &bValue;
+    modify_slider(winSliderB, baseColorValue, upperLimit, 220); // B
+    baseColorValue = &rValue;
+    modify_slider(winSliderR, baseColorValue, upperLimit, 218); // R
+
+    fill_window(winFill, winFillH);
+    change_resultantWin_color(winFill, rValue, gValue, bValue, winFillH);//to initialize
+
     while(1)
     {
-        fill_window(winFill,rValue,gValue, bValue,winFillH);
+        //#####№####### Debugging #######
         mvprintw(1,4,"%d", rValue);
         mvprintw(2,4,"%d", gValue);
         mvprintw(3,4,"%d", bValue);
         mvprintw(4,4,"baseColor %d", baseColor);
         mvprintw(5,4,"pairNumber %d", pairNumber);
-        mvprintw(6,4,"colorLoop%d", colorLoop);
+        /* refresh(); */
 
-        refresh();
+        change_resultantWin_color(winFill, rValue, gValue, bValue, winFillH);
+        ch = getch();
+        // analyse user input and change variable values to take effect
+        switch(ch)
+        {
+            case KEY_UP:
+                increase_colorValue(baseColorValue, upperLimit);
+                break;
+            case KEY_DOWN:
+                decrease_colorValue(baseColorValue);
+                break;
+            case KEY_RIGHT:
+                if(baseColor == 1) baseColor = 2;
+                else if (baseColor == 2) baseColor = 0;
+                switch(baseColor)
+                {
+                    case 1:
+                        baseColorValue = &rValue;
+                        break;
+                    case 2:
+                        baseColorValue = &gValue;
+                        break;
+                    case 0:
+                        baseColorValue = &bValue;
+                        break;
+                }
+                break;
+
+            case KEY_LEFT:
+                if(baseColor == 0) baseColor = 2;
+                else if (baseColor == 2)baseColor = 1;
+
+                switch(baseColor)
+                {
+                    case 1:
+                        baseColorValue = &rValue;
+                        break;
+                    case 2:
+                        baseColorValue = &gValue;
+                        break;
+                    case 0:
+                        baseColorValue = &bValue;
+                        break;
+                }
+                break;
+
+            default: break;
+        }
 
         // highlight and modify slider
         switch(baseColor)
@@ -168,58 +207,6 @@ int main()
                 wrefresh(winSliderB);
                 break;
         }
-        ch = getch();
-        // analyse user input and change variabke values to take effect
-        switch(ch)
-        {
-            case KEY_UP:
-                increase_colorValue(baseColorValue, upperLimit);
-                break;
-            case KEY_DOWN:
-                decrease_colorValue(baseColorValue);
-                break;
-            case KEY_RIGHT:
-                colorLoop++;
-                a = colorLoop % 3;
-                switch(a)
-                {
-                    case 1:
-                        baseColor = 1;
-                        baseColorValue = &rValue;
-                        break;
-                    case 2:
-                        baseColor = 2;
-                        baseColorValue = &gValue;
-                        break;
-                    case 0:
-                        baseColor = 0;
-                        baseColorValue = &bValue;
-                        break;
-                }
-                break;
-
-            case KEY_LEFT:
-                colorLoop--;
-                a = colorLoop % 3;
-                switch(a)
-                {
-                    case 1:
-                        baseColor = 1;
-                        baseColorValue = &rValue;
-                        break;
-                    case 2:
-                        baseColor = 2;
-                        baseColorValue = &gValue;
-                        break;
-                    case 0:
-                        baseColor = 0;
-                        baseColorValue = &bValue;
-                        break;
-                }
-                break;
-            default:
-                break;
-        }
 
     }
 
@@ -230,12 +217,6 @@ int main()
     return 0;
     return 0;
 }
-
-
-
-/********** Main function Ends Here *************/
-
-
 
 
 // initialize all colors and form the color cubes in bottom window
@@ -265,11 +246,13 @@ void init_color_ncubes(WINDOW * winColorCubes)
     }
 }
 
+
 void increase_colorValue(short int* baseColorValue, short int upperLimit)
 {
     if (*baseColorValue == upperLimit) (*baseColorValue) --;
     (*baseColorValue)++;
 }
+
 
 void decrease_colorValue(short int* baseColorValue)
 {
@@ -277,15 +260,20 @@ void decrease_colorValue(short int* baseColorValue)
     (*baseColorValue)--;
 }
 
+
+
+
 void dim_slider_window(WINDOW * win)
 {
     wborder(win, 32, 32, 32, 32, 32, 32, 32, 32);
 }
 
+
 void highlight_slider_window(WINDOW * win)
 {
     box(win, 0, 0);
 }
+
 
 void fill8_vl(WINDOW * win, int8_t height)
 {
@@ -321,10 +309,12 @@ void fill8_vl(WINDOW * win, int8_t height)
     }
 }
 
+
 int8_t count_steps(short int b, short int u)
 {
     return std::round(static_cast<float>(b)*64/u);
 }
+
 
 void do_solid_fill_slider(WINDOW * win, int8_t blocks)
 {
@@ -334,7 +324,6 @@ void do_solid_fill_slider(WINDOW * win, int8_t blocks)
         fill8_vl(win, 8);
     }
 }
-
 
 
 // colours tha pessed RGB bar window to it's color
@@ -347,7 +336,7 @@ void modify_slider(WINDOW * win, short int* baseColorValue, short int upperLimit
     int8_t solidFills = steps/8;
 
     /* init_pair(218, colorNumber, COLOR_BLACK); */
-    refresh();
+    /* refresh(); */
     wattron(win, COLOR_PAIR(pairNumber));
     for(int i = 1; i <= solidFills; i++)
     {
@@ -361,16 +350,12 @@ void modify_slider(WINDOW * win, short int* baseColorValue, short int upperLimit
     mvprintw(10,4,"steps %d", steps);
     mvprintw(11,4,"solidFills %d", solidFills);
     mvprintw(12,4,"slice %d", steps - solidFills*8);
-    refresh();
+    /* refresh(); */
 }
 
 
-void fill_window(WINDOW * win,short int r,short int g,short int b, int8_t winFillH)
+void fill_window(WINDOW * win, int8_t winFillH)
 {
-
-    init_color(217, r*999/255, g*999/255, b*999/255);
-    init_pair(221, 217, 217);
-    refresh();
     wattron(win, COLOR_PAIR(221));
     for(int i = 0; i < (winFillH-2); i++)
     {
@@ -381,5 +366,13 @@ void fill_window(WINDOW * win,short int r,short int g,short int b, int8_t winFil
         }
     }
     wattroff(win, COLOR_PAIR(221));
+    /* wrefresh(win); */
+}
+
+void change_resultantWin_color(WINDOW * win,short int r,short int g,short int b, int8_t winFillH)
+{
+    init_color(217, r*999/255, g*999/255, b*999/255);
+    init_pair(221, 217, 217);
+    /* refresh(); */
     wrefresh(win);
 }
