@@ -1,8 +1,8 @@
-### Hi there 👋
+# Hi there 👋
 
 <pre>
 This is my Public🌍 Repository🗂️.
-You are free🔓 to download📥 and modify📝 the resources📚.
+You are <i>free</i>🔓 to <i>download</i>📥 and <i>modify</i>📝 the resources📚.
 <b>Peace🌿</b>
 
 ⚔️⚔️⚔️
