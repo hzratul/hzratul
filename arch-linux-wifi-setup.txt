@@ -1,0 +1,36 @@
+# Check if iwctl works to cennect to wifi
+iwctl
+
+# If iwctl doesn't work, check iwd status
+sudo systemctl status iwd
+
+# If iwd is inactive, start/restart it to activate it
+sudo systemctl restart iwd
+
+# Now try to connect to wifi
+iwctl 
+station list # Look for <WIFI_DEV_NAME>
+station <WIFI_DEV_NAME> scan
+station <WIFI_DEV_NAME> get-networks #look for wifi name
+station <WIFI_DEV_NAME> connect <WIFI_NAME>
+# if wifi is connected you will see a > mark before it.
+exit # exit from iwctl
+
+# check connectivity by $ping google.com
+# If still not connected, check if ur have a IPv4 addr
+iwctl station wlan0 show
+# If says DHCP needs to be configured then
+# Manually assign an ip to your device
+sudo ip addr add <SET_A_LOCAL_DEVICE _IP_ADDR>/24 dev wlan0
+
+# Manually set the default getway ip of router
+sudo ip route add default via <LOCAL_DEFAULT_GATEWAY_IP_ADDR> dev wlan0
+
+# Try to ping the default gateway
+ping <GATEWAY_IP>
+# If it works but internet is not available, add 
+# the following lines to this file /etc/resolv.conf
+# nameserver 8.8.8.8
+# nameserver 8.8.4.4, it help me.
+# Now try to ping google.com hopefully it will work, else grind 
+# with Deepseek/ChatGPT :), it help me.
